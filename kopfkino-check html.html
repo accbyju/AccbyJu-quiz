@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wie laut ist dein Kopfkino? – ACCbyJu</title>
+<style>
+  :root{
+    --gruen:#1f3d2b;        /* dunkles Waldgrün der Marke */
+    --petrol:#3fb6ad;       /* Petrol-Akzent der Buttons */
+    --petrol-dunkel:#2f9089;
+    --rosa:#f7e9ec;         /* zarter rosa Verlauf */
+    --rosa-tief:#efd8dd;
+    --creme:#fbfaf8;
+    --grau:#6f7a72;
+    --karte:#ffffff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--gruen);
+    background:linear-gradient(160deg,var(--rosa) 0%,var(--creme) 55%,var(--rosa-tief) 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:clamp(24px,5vw,56px) clamp(18px,4vw,32px)}
+
+  /* Fortschritt */
+  .progress{
+    position:sticky;top:0;z-index:10;
+    height:6px;background:rgba(31,61,43,.08);
+    border-radius:99px;overflow:hidden;margin-bottom:36px;
+  }
+  .progress span{display:block;height:100%;width:0;background:var(--petrol);
+    transition:width .45s cubic-bezier(.4,0,.2,1);border-radius:99px}
+
+  /* Intro */
+  .eyebrow{font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--petrol-dunkel);font-weight:700;margin-bottom:14px}
+  h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.1;font-weight:800;
+    letter-spacing:-.02em;margin-bottom:18px}
+  .lede{font-size:1.08rem;color:var(--gruen);opacity:.85;margin-bottom:30px;max-width:52ch}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--petrol);color:#fff;border:none;cursor:pointer;
+    font-size:1.02rem;font-weight:700;padding:16px 30px;border-radius:99px;
+    transition:transform .15s ease,background .2s ease;width:100%;
+    font-family:inherit;
+  }
+  .btn:hover{background:var(--petrol-dunkel);transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn:focus-visible{outline:3px solid var(--gruen);outline-offset:3px}
+  .btn.ghost{background:transparent;color:var(--petrol-dunkel);
+    text-decoration:underline;width:auto;padding:10px;font-weight:600}
+
+  /* Screens */
+  .screen{display:none;animation:fade .4s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* Fragen */
+  .qcount{font-size:.85rem;color:var(--grau);font-weight:600;margin-bottom:10px}
+  .question{font-size:clamp(1.3rem,4vw,1.7rem);font-weight:800;line-height:1.2;
+    margin-bottom:26px;letter-spacing:-.01em}
+  .options{display:flex;flex-direction:column;gap:12px}
+  .opt{
+    background:var(--karte);border:2px solid transparent;border-radius:16px;
+    padding:18px 20px;font-size:1.02rem;text-align:left;cursor:pointer;
+    color:var(--gruen);font-family:inherit;transition:border-color .15s,transform .12s,box-shadow .15s;
+    box-shadow:0 2px 12px rgba(31,61,43,.05);line-height:1.4;
+  }
+  .opt:hover{border-color:var(--petrol);transform:translateY(-1px)}
+  .opt:focus-visible{outline:3px solid var(--gruen);outline-offset:2px}
+
+  /* E-Mail-Gate */
+  .gate-card{background:var(--karte);border-radius:22px;padding:clamp(26px,5vw,40px);
+    box-shadow:0 10px 40px rgba(31,61,43,.1)}
+  label{display:block;font-weight:700;font-size:.95rem;margin-bottom:8px}
+  input[type=email]{
+    width:100%;padding:15px 16px;font-size:1rem;border:2px solid #e3e0db;
+    border-radius:12px;font-family:inherit;color:var(--gruen);margin-bottom:18px;
+  }
+  input[type=email]:focus{outline:none;border-color:var(--petrol)}
+  .consent{display:flex;gap:11px;align-items:flex-start;margin-bottom:22px;
+    font-size:.85rem;color:var(--grau);line-height:1.45}
+  .consent input{margin-top:3px;width:18px;height:18px;flex-shrink:0;accent-color:var(--petrol)}
+  .consent a{color:var(--petrol-dunkel)}
+  .mini{font-size:.78rem;color:var(--grau);text-align:center;margin-top:16px;line-height:1.5}
+
+  /* Ergebnis */
+  .result-type{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--petrol-dunkel);font-weight:700;margin-bottom:10px}
+  .result-card{background:var(--karte);border-radius:22px;padding:clamp(26px,5vw,40px);
+    box-shadow:0 10px 40px rgba(31,61,43,.1);margin-bottom:24px}
+  .result-card h2{font-size:clamp(1.6rem,5vw,2.2rem);line-height:1.12;margin-bottom:16px;font-weight:800}
+  .result-card p{margin-bottom:14px;opacity:.9}
+  .result-card p:last-child{margin-bottom:0}
+  .bridge{text-align:center;padding:8px 4px 0}
+  .bridge p{color:var(--gruen);opacity:.85;margin-bottom:18px;font-size:1.05rem}
+  .err{color:#b3261e;font-size:.85rem;margin-bottom:14px;display:none}
+  .err.show{display:block}
+  footer{text-align:center;margin-top:34px;font-size:.78rem;color:var(--grau)}
+  footer a{color:var(--grau)}
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+
+  /* ---- Brevo-Formular an die Marke angleichen ---- */
+  .sib-form{padding:0 !important;background:transparent !important;text-align:left !important}
+  #sib-form-container{max-width:none !important}
+  #sib-container{background:transparent !important;border:none !important;padding:0 !important;
+    max-width:none !important;text-align:left !important}
+  #sib-form .entry__label{font-family:inherit !important;font-size:.9rem !important;font-weight:700 !important;
+    color:var(--gruen) !important;margin-bottom:8px !important;letter-spacing:.02em}
+  #sib-form .input{font-family:inherit !important;width:100% !important;padding:14px 16px !important;
+    border:2px solid rgba(31,61,43,.14) !important;border-radius:14px !important;font-size:1rem !important;
+    color:var(--gruen) !important;background:#fff !important}
+  #sib-form .input:focus{outline:none !important;border-color:var(--petrol) !important}
+  #sib-form .sib-form-block__button{font-family:inherit !important;background:var(--petrol) !important;
+    color:#fff !important;border:none !important;border-radius:99px !important;padding:16px 30px !important;
+    font-size:1.02rem !important;font-weight:700 !important;width:100% !important;
+    justify-content:center !important;cursor:pointer !important;text-align:center !important}
+  #sib-form .sib-form-block__button:hover{background:var(--petrol-dunkel) !important}
+  #sib-form .entry__specification{font-family:inherit !important;color:var(--grau) !important;
+    font-size:.78rem !important}
+  #sib-form .sib-optin span{font-family:inherit !important;color:var(--gruen) !important;font-size:.86rem !important}
+  #sib-form .sib-optin p{margin:0}
+  #sib-form a{color:var(--petrol-dunkel) !important}
+  .sib-form-message-panel{font-family:inherit !important;max-width:none !important;border-radius:14px !important}
+  .g-recaptcha{transform:scale(.86);transform-origin:0 0;margin-bottom:-12px}
+</style>
+<link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+
+  <!-- INTRO -->
+  <section class="screen active" id="intro">
+    <div class="eyebrow">Ein kurzer, ehrlicher Selbst-Check</div>
+    <h1>Wie laut ist dein Kopfkino mit dem Essen?</h1>
+    <p class="lede">Viele Frauen sind nicht auf Diät – und denken trotzdem den ganzen Tag ans Essen. Was darf ich? Was nicht? War das zu viel? In 7 kurzen Fragen findest du heraus, wie sehr dich dieses ständige Mitdenken im Alltag begleitet. Ehrlich, ohne Wertung, in unter zwei Minuten.</p>
+    <button class="btn" onclick="start()">Selbst-Check starten</button>
+  </section>
+
+  <!-- FRAGEN -->
+  <section class="screen" id="quiz">
+    <div class="qcount" id="qcount"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div style="margin-top:20px">
+      <button class="btn ghost" id="backBtn" onclick="back()" style="display:none">← Zurück</button>
+    </div>
+  </section>
+
+  <!-- E-MAIL GATE (Brevo-Formular) -->
+  <section class="screen" id="gate">
+    <div class="gate-card">
+      <div class="eyebrow">Fast geschafft</div>
+      <h1 style="font-size:clamp(1.5rem,5vw,2rem);margin-bottom:14px">Dein Ergebnis ist fertig.</h1>
+      <p style="opacity:.85;margin-bottom:26px">Sag mir, wohin ich dir deine persoenliche Auswertung schicken darf &ndash; zusammen mit deinem 21-Tage-Start-Tracker als PDF.</p>
+
+      <!-- Begin Brevo Form -->
+      <div class="sib-form">
+        <div id="sib-form-container" class="sib-form-container">
+
+          <div id="error-message" class="sib-form-message-panel" style="font-size:15px;text-align:left;color:#661d1d;background-color:#ffeded;border-color:#ff4949;">
+            <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+              <span class="sib-form-message-panel__inner-text">Deine Anmeldung konnte nicht gespeichert werden. Bitte versuche es erneut.</span>
+            </div>
+          </div>
+
+          <div id="success-message" class="sib-form-message-panel" style="font-size:15px;text-align:left;color:#085229;background-color:#e7faf0;border-color:#13ce66;">
+            <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+              <span class="sib-form-message-panel__inner-text">Fast geschafft: Bitte bestaetige kurz den Link in deiner E-Mail. Dein Ergebnis erscheint gleich hier.</span>
+            </div>
+          </div>
+
+          <div id="sib-container" class="sib-container--large sib-container--vertical">
+            <form id="sib-form" method="POST" action="https://8f79c2ed.sibforms.com/serve/MUIFAO1aIHviYxBFOvFriTzUZjoqC1-LTx69D4EOkS22xTNgJXk11DeRZ6ARgbfgaqXbJ6QKbK-EXSxXjdgqnu8zIWnTj75rO5GVJhIULtf0mpUeJgEHYIte4CeuR1SglnrOJF57HoPGfFV21jS1JAoJTGqC9iTYN2t59-X88FvRGRUj9CxV5CNbdCwOa_dmi5gZVLUpJZ84By3uFw==" data-type="subscription">
+
+              <div style="padding:8px 0">
+                <div class="sib-input sib-form-block">
+                  <div class="form__entry entry_block">
+                    <div class="form__label-row">
+                      <label class="entry__label" for="VORNAME" data-required="*">Dein Vorname</label>
+                      <div class="entry__field">
+                        <input class="input" maxlength="200" type="text" id="VORNAME" name="VORNAME" autocomplete="given-name" placeholder="Vorname" data-required="true" required />
+                      </div>
+                    </div>
+                    <label class="entry__error entry__error--primary"></label>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding:8px 0">
+                <div class="sib-input sib-form-block">
+                  <div class="form__entry entry_block">
+                    <div class="form__label-row">
+                      <label class="entry__label" for="EMAIL" data-required="*">Deine E-Mail-Adresse</label>
+                      <div class="entry__field">
+                        <input class="input" type="text" id="EMAIL" name="EMAIL" autocomplete="email" value="" placeholder="name@beispiel.de" data-required="true" required />
+                      </div>
+                    </div>
+                    <label class="entry__error entry__error--primary"></label>
+                    <label class="entry__specification">Gib bitte deine E-Mail-Adresse fuer die Anmeldung an, z.&nbsp;B. abc@xyz.com.</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quiz-Ergebnis: wird per JS gefuellt -->
+              <input type="hidden" id="QUIZERGEBNIS" name="QUIZERGEBNIS" value="">
+
+              <div style="padding:8px 0">
+                <div class="sib-optin sib-form-block">
+                  <div class="form__entry entry_mcq">
+                    <div class="form__label-row">
+                      <div class="entry__choice">
+                        <label>
+                          <input type="checkbox" class="input_replaced" value="1" id="NEWSLETTER_OPT_IN" name="NEWSLETTER_OPT_IN" data-required="true" required />
+                          <span class="checkbox checkbox_tick_positive"></span>
+                          <span><p>Ja, ich moechte mein Ergebnis und den Start-Tracker per E-Mail erhalten und kuenftig Impulse von ACCbyJu bekommen. Ich habe die <a href="https://accbyju.com/datenschutz" target="_blank" rel="nofollow noopener">Datenschutzerklaerung</a> gelesen. Abmeldung jederzeit moeglich.</p></span>
+                        </label>
+                      </div>
+                    </div>
+                    <label class="entry__error entry__error--primary"></label>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding:8px 0">
+                <div class="sib-captcha sib-form-block">
+                  <div class="form__entry entry_block">
+                    <div class="form__label-row">
+                      <div class="g-recaptcha sib-visible-recaptcha" id="sib-captcha" data-sitekey="6LcNI1ctAAAAAJnHd6GY1zpi7_XGGOO416pf4dHl" data-callback="handleCaptchaResponse" style="direction:ltr"></div>
+                    </div>
+                    <label class="entry__error entry__error--primary"></label>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding:8px 0">
+                <div class="sib-form-block" style="text-align:left">
+                  <button class="sib-form-block__button sib-form-block__button-with-loader" form="sib-form" type="submit">Ergebnis anfordern</button>
+                </div>
+              </div>
+
+              <input type="text" name="email_address_check" value="" class="input--hidden">
+              <input type="hidden" name="locale" value="de">
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- End Brevo Form -->
+
+      <p class="mini">Kein Spam. Abmeldung jederzeit mit einem Klick.</p>
+    </div>
+  </section>
+
+  <!-- ERGEBNIS -->
+  <section class="screen" id="result">
+    <div class="result-card">
+      <div class="result-type" id="rtype"></div>
+      <h2 id="rtitle"></h2>
+      <div id="rbody"></div>
+    </div>
+    <div class="bridge">
+      <p>Du musst diesen Weg nicht allein gehen. Wenn du magst, schauen wir gemeinsam, wie ein entspannteres Verhältnis zum Essen für dich aussehen kann.</p>
+      <a class="btn" id="ctaBtn" href="#" style="text-decoration:none">Erstgespräch anfragen</a>
+    </div>
+    <footer>ACCbyJu · <a href="#">Datenschutz</a> · <a href="#">Impressum</a></footer>
+  </section>
+</div>
+
+<script>
+/* ---- Fragen: jede Antwort gibt 0–2 Punkte (0 = ruhig, 2 = lautes Kopfkino) ---- */
+const questions = [
+  { q:"Wenn du etwas isst, das du „eigentlich nicht solltest“ – was passiert danach in deinem Kopf?",
+    a:[["Nichts Besonderes, ich genieße es",0],["Ein kurzer Gedanke, dann ist es weg",1],["Ich rechne im Kopf nach oder nehme es mir später wieder „ab“",2]] },
+  { q:"Wie oft denkst du über den Tag verteilt ans Essen?",
+    a:[["Nur wenn ich Hunger habe",0],["Ab und zu zwischendurch",1],["Eigentlich ständig im Hintergrund",2]] },
+  { q:"Kennst du den Gedanken „Ab morgen mache ich es besser“?",
+    a:[["Selten bis nie",0],["Manchmal",1],["Fast jeden Abend",2]] },
+  { q:"Kannst du eine Mahlzeit genießen, ohne sie innerlich zu bewerten?",
+    a:[["Ja, meistens schon",0],["Kommt auf die Mahlzeit an",1],["Ehrlich? Kaum noch",2]] },
+  { q:"Wie fühlt sich „gut gegessen“ für dich an?",
+    a:[["Satt und zufrieden",0],["Mal so, mal so",1],["Eher: nichts falsch gemacht zu haben",2]] },
+  { q:"Wenn die Waage etwas anderes zeigt als erhofft – wie geht es dir?",
+    a:[["Das beeinflusst mich kaum",0],["Kurz genervt, dann weiter",1],["Es zieht mir den ganzen Tag runter",2]] },
+  { q:"Wie viel Energie kostet dich dieses ständige Mitdenken?",
+    a:[["Wenig – es ist kein großes Thema",0],["Etwas mehr, als mir lieb ist",1],["Viel. Es ermüdet mich",2]] },
+];
+
+/* ---- Drei Ergebnistypen ---- */
+const results = {
+  ruhig:{
+    type:"Dein Ergebnis",
+    title:"Du hast ein weitgehend ruhiges Verhältnis zum Essen",
+    body:`<p>Essen nimmt in deinem Kopf nicht den großen Raum ein, den es bei vielen Frauen einnimmt. Du isst, du genießt, du gehst weiter – und das ist eine echte Stärke.</p>
+          <p>Wenn doch hin und wieder ein Gedanke aufkommt („war das zu viel?“), ist das normal. Spannend wird es, diese Ruhe auch in stressigen Phasen zu halten, in denen alte Muster gern zurückkommen.</p>` },
+  schwankend:{
+    type:"Dein Ergebnis",
+    title:"Dein Kopfkino läuft – mal leiser, mal lauter",
+    body:`<p>Du kennst beides: entspannte Momente mit dem Essen und Tage, an denen das ständige Bewerten anstrengend wird. Oft hängt es am Stresslevel, am Alltag, an äußerem Druck.</p>
+          <p>Das ist kein Gewichtsproblem – es ist die Lücke zwischen „ich weiß, wie es geht“ und „im Alltag rutscht es mir weg“. Genau hier lässt sich mit kleinen, klaren Schritten am meisten verändern.</p>` },
+  laut:{
+    type:"Dein Ergebnis",
+    title:"Dein Kopfkino ist gerade ziemlich laut",
+    body:`<p>Essen begleitet dich den ganzen Tag im Hintergrund – als Rechnen, Bewerten, als „ab morgen besser“. Das ist kein Zeichen von zu wenig Disziplin. Im Gegenteil: Es ist Erschöpfung von zu viel Mitdenken.</p>
+          <p>Die gute Nachricht: Dieser Kreislauf lässt sich durchbrechen. Nicht mit der nächsten Diät, sondern damit, dem Kopf wieder Ruhe zu geben. Essen darf wieder einfach werden.</p>` },
+};
+
+let current=0, score=0, history=[];
+const screens={intro:byId("intro"),quiz:byId("quiz"),gate:byId("gate"),result:byId("result")};
+function byId(id){return document.getElementById(id)}
+
+function show(name){
+  Object.values(screens).forEach(s=>s.classList.remove("active"));
+  screens[name].classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function setBar(pct){byId("bar").style.width=pct+"%"}
+
+function start(){current=0;score=0;history=[];render();show("quiz")}
+
+function render(){
+  const item=questions[current];
+  byId("qcount").textContent=`Frage ${current+1} von ${questions.length}`;
+  byId("question").textContent=item.q;
+  setBar(Math.round((current/questions.length)*100));
+  const box=byId("options");box.innerHTML="";
+  item.a.forEach(([text,pts])=>{
+    const b=document.createElement("button");
+    b.className="opt";b.textContent=text;
+    b.onclick=()=>choose(pts);
+    box.appendChild(b);
+  });
+  byId("backBtn").style.display=current>0?"inline-flex":"none";
+}
+const ergebnisLabel={ruhig:"Ruhig",schwankend:"Schwankend",laut:"Laut"};
+function resultKey(){
+  const ratio=score/(questions.length*2);
+  if(ratio<=0.33)return "ruhig";
+  if(ratio>=0.66)return "laut";
+  return "schwankend";
+}
+function choose(pts){
+  history.push(pts);score+=pts;current++;
+  if(current<questions.length){render()}
+  else{
+    setBar(100);
+    const f=byId("QUIZERGEBNIS");
+    if(f)f.value=ergebnisLabel[resultKey()];
+    show("gate");
+  }
+}
+function back(){
+  if(current===0)return;
+  current--;score-=history.pop();render();
+}
+
+function showResult(){
+  const r=results[resultKey()];
+  byId("rtype").textContent=r.type;
+  byId("rtitle").textContent=r.title;
+  byId("rbody").innerHTML=r.body;
+  /* CTA-Link: hier später deine Wix-Anfrageseite eintragen */
+  byId("ctaBtn").setAttribute("href","#erstgespraech");
+  show("result");
+}
+
+/* Captcha-Callback, den das Brevo-Skript erwartet */
+function handleCaptchaResponse(){
+  document.getElementById("sib-captcha").dispatchEvent(new Event("captchaChange"));
+}
+
+/* Sobald Brevo die Erfolgsmeldung einblendet, das Ergebnis zeigen. */
+(function(){
+  const panel=document.getElementById("success-message");
+  if(!panel)return;
+  const obs=new MutationObserver(function(){
+    if(window.getComputedStyle(panel).display!=="none"){
+      obs.disconnect();
+      setTimeout(showResult,1600);
+    }
+  });
+  obs.observe(panel,{attributes:true,attributeFilter:["style","class"]});
+})();
+</script>
+
+<script>
+  window.REQUIRED_CODE_ERROR_MESSAGE='Waehle bitte einen Laendervorwahl aus.';
+  window.LOCALE='de';
+  window.EMAIL_INVALID_MESSAGE=window.SMS_INVALID_MESSAGE="Die eingegebenen Informationen sind nicht gueltig. Bitte ueberpruefe das Feldformat und versuche es erneut.";
+  window.REQUIRED_ERROR_MESSAGE="Dieses Feld darf nicht leer sein.";
+  window.GENERIC_INVALID_MESSAGE="Die eingegebenen Informationen sind nicht gueltig. Bitte ueberpruefe das Feldformat und versuche es erneut.";
+  window.INVALID_NUMBER="Die eingegebenen Informationen sind nicht gueltig.";
+  window.INVALID_DATE="Bitte gib ein gueltiges Datum ein";
+  window.REQUIRED_MULTISELECT_MESSAGE='Waehle bitte mindestens eine Option aus';
+  window.translation={common:{
+    selectedList:'{quantity} Liste ausgewaehlt',
+    selectedLists:'{quantity} Listen ausgewaehlt',
+    selectedOption:'{quantity} ausgewaehlt',
+    selectedOptions:'{quantity} ausgewaehlt'}};
+  var AUTOHIDE=Boolean(0);
+</script>
+<script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
+<script src="https://www.google.com/recaptcha/api.js?hl=de"></script>
+</body>
+</html>
