@@ -187,7 +187,7 @@
           </div>
 
           <div id="sib-container" class="sib-container--large sib-container--vertical">
-            <form id="sib-form" method="POST" action="https://8f79c2ed.sibforms.com/serve/MUIFAO1aIHviYxBFOvFriTzUZjoqC1-LTx69D4EOkS22xTNgJXk11DeRZ6ARgbfgaqXbJ6QKbK-EXSxXjdgqnu8zIWnTj75rO5GVJhIULtf0mpUeJgEHYIte4CeuR1SglnrOJF57HoPGfFV21jS1JAoJTGqC9iTYN2t59-X88FvRGRUj9CxV5CNbdCwOa_dmi5gZVLUpJZ84By3uFw==" data-type="subscription">
+            <form id="sib-form" method="POST" action="https://8f79c2ed.sibforms.com/serve/MUIFAO1aIHviYxBFOvFriTzUZjoqC1-LTx69D4EOkS22xTNgJXk11DeRZ6ARgbfgaqXbJ6QKbK-EXSxXjdgqnu8zIWnTj75rO5GVJhIULtf0mpUeJgEHYIte4CeuR1SglnrOJF57HoPGfFV21jS1JAoJTGqC9iTYN2t59-X88FvRGRUj9CxV5CNbdCwOa_dmi5gZVLUpJZ84By3uFw==" data-type="subscription" target="brevo-sink">
 
               <div style="padding:8px 0">
                 <div class="sib-input sib-form-block">
@@ -249,6 +249,8 @@
                 </div>
               </div>
 
+              <div class="err" id="gateErr"></div>
+
               <div style="padding:8px 0">
                 <div class="sib-form-block" style="text-align:left">
                   <button class="sib-form-block__button sib-form-block__button-with-loader" form="sib-form" type="submit">
@@ -265,6 +267,8 @@
         </div>
       </div>
       <!-- End Brevo Form -->
+      <iframe name="brevo-sink" id="brevo-sink" title="" aria-hidden="true"
+              style="position:absolute;width:0;height:0;border:0;visibility:hidden"></iframe>
 
       <p class="mini">Kein Spam. Abmeldung jederzeit mit einem Klick.</p>
     </div>
@@ -381,42 +385,52 @@ function showResult(){
   show("result");
 }
 
-/* Captcha-Callback, den das Brevo-Skript erwartet */
+/* Captcha geloest -> Fehlermeldung wieder ausblenden */
 function handleCaptchaResponse(){
-  document.getElementById("sib-captcha").dispatchEvent(new Event("captchaChange"));
+  const e=byId("gateErr");
+  if(e)e.classList.remove("show");
 }
 
-/* Sobald Brevo die Erfolgsmeldung einblendet, das Ergebnis zeigen. */
+/* ---- Absenden: Formular postet nativ in ein verstecktes Iframe.
+       Die Seite bleibt stehen, danach kommt das Ergebnis. ---- */
 (function(){
-  const panel=document.getElementById("success-message");
-  if(!panel)return;
-  const obs=new MutationObserver(function(){
-    if(window.getComputedStyle(panel).display!=="none"){
-      obs.disconnect();
-      setTimeout(showResult,1600);
+  const form=byId("sib-form"), sink=byId("brevo-sink"), err=byId("gateErr");
+  const panel=byId("success-message");
+  if(!form||!sink)return;
+  const btn=form.querySelector('button[type="submit"]');
+  let pending=false, timer=null;
+
+  function fail(msg){
+    pending=false;
+    clearTimeout(timer);
+    if(err){err.textContent=msg;err.classList.add("show")}
+    if(btn)btn.disabled=false;
+  }
+
+  form.addEventListener("submit",function(ev){
+    if(window.grecaptcha&&typeof grecaptcha.getResponse==="function"&&!grecaptcha.getResponse()){
+      ev.preventDefault();
+      fail("Bitte bestaetige kurz, dass du kein Roboter bist.");
+      return;
     }
+    if(err)err.classList.remove("show");
+    pending=true;
+    if(btn)btn.disabled=true;
+    timer=setTimeout(function(){
+      if(pending)fail("Das hat gerade nicht geklappt. Bitte versuche es noch einmal.");
+    },15000);
   });
-  obs.observe(panel,{attributes:true,attributeFilter:["style","class"]});
+
+  sink.addEventListener("load",function(){
+    if(!pending)return;          /* erster, leerer Ladevorgang */
+    pending=false;
+    clearTimeout(timer);
+    if(panel)panel.style.display="block";
+    setTimeout(showResult,1600);
+  });
 })();
 </script>
 
-<script>
-  window.REQUIRED_CODE_ERROR_MESSAGE='Waehle bitte einen Laendervorwahl aus.';
-  window.LOCALE='de';
-  window.EMAIL_INVALID_MESSAGE=window.SMS_INVALID_MESSAGE="Die eingegebenen Informationen sind nicht gueltig. Bitte ueberpruefe das Feldformat und versuche es erneut.";
-  window.REQUIRED_ERROR_MESSAGE="Dieses Feld darf nicht leer sein.";
-  window.GENERIC_INVALID_MESSAGE="Die eingegebenen Informationen sind nicht gueltig. Bitte ueberpruefe das Feldformat und versuche es erneut.";
-  window.INVALID_NUMBER="Die eingegebenen Informationen sind nicht gueltig.";
-  window.INVALID_DATE="Bitte gib ein gueltiges Datum ein";
-  window.REQUIRED_MULTISELECT_MESSAGE='Waehle bitte mindestens eine Option aus';
-  window.translation={common:{
-    selectedList:'{quantity} Liste ausgewaehlt',
-    selectedLists:'{quantity} Listen ausgewaehlt',
-    selectedOption:'{quantity} ausgewaehlt',
-    selectedOptions:'{quantity} ausgewaehlt'}};
-  var AUTOHIDE=Boolean(0);
-</script>
-<script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
 <script src="https://www.google.com/recaptcha/api.js?hl=de"></script>
 </body>
 </html>
