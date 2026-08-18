@@ -107,8 +107,12 @@
   .bridge p{color:var(--gruen);opacity:.85;margin-bottom:18px;font-size:1.05rem}
   .err{color:#b3261e;font-size:.85rem;margin-bottom:14px;display:none}
   .err.show{display:block}
-  footer{text-align:center;margin-top:34px;font-size:.78rem;color:var(--grau)}
+  footer{text-align:center;margin-top:40px;padding-top:22px;
+    border-top:1px solid rgba(31,61,43,.1);
+    font-size:.78rem;color:var(--grau);line-height:1.7}
   footer a{color:var(--grau)}
+  .disclaimer{margin-top:10px;font-size:.74rem;opacity:.85;max-width:56ch;
+    margin-left:auto;margin-right:auto}
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
   }
@@ -308,8 +312,16 @@
       <p>Du musst diesen Weg nicht allein gehen. Wenn du magst, schauen wir gemeinsam, wie ein entspannteres Verhältnis zum Essen für dich aussehen kann.</p>
       <a class="btn" id="ctaBtn" href="https://www.accbyju.com" style="text-decoration:none">Bewerbung starten</a>
     </div>
-    <footer>ACCbyJu · <a href="https://www.accbyju.com/datenschutz">Datenschutz</a> · <a href="https://www.accbyju.com/impressum">Impressum</a></footer>
   </section>
+
+  <!-- FOOTER: gilt fuer alle Screens -->
+  <footer>
+    ACCbyJu · Julia Laage · Randstraße 1 · 22525 Hamburg<br>
+    <a href="mailto:ju@accbyju.com">ju@accbyju.com</a> · +49 40 5247639-7<br>
+    <a href="https://www.accbyju.com/impressum" target="_blank" rel="noopener">Impressum</a> ·
+    <a href="https://www.accbyju.com/datenschutz" target="_blank" rel="noopener">Datenschutz</a>
+    <p class="disclaimer">ACCbyJu ist ein Ernährungs- und Accountability-Coaching für gesunde Frauen. Es stellt keine ärztliche Behandlung, Diagnose oder Therapie dar und ersetzt keine. Ich behandle keine Essstörungen, kein pathologisches Übergewicht und keine Hungerstörungen. Bei gesundheitlichen Beschwerden wende dich bitte an deine behandelnden Ärztinnen und Ärzte.</p>
+  </footer>
 </div>
 
 <script>
